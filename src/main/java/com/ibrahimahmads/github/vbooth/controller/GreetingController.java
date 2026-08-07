@@ -3,7 +3,6 @@ package com.ibrahimahmads.github.vbooth.controller;
 import com.ibrahimahmads.github.vbooth.dto.request.GreetingRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.DownloadPhotoResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.GreetingsResponse;
-import com.ibrahimahmads.github.vbooth.entity.Greetings;
 import com.ibrahimahmads.github.vbooth.service.GreetingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -22,7 +21,7 @@ public class GreetingController {
     private final GreetingService greetingService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Greetings> save(@ModelAttribute GreetingRequest payload) {
+    public ResponseEntity<GreetingsResponse> save(@ModelAttribute GreetingRequest payload) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(greetingService.save(payload));

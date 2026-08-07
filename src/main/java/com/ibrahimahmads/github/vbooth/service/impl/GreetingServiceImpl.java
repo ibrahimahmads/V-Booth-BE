@@ -27,7 +27,7 @@ public class GreetingServiceImpl implements GreetingService {
     private final CloudinaryService cloudinaryService;
 
     @Override
-    public Greetings save(GreetingRequest payload) {
+    public GreetingsResponse save(GreetingRequest payload) {
         if (payload.guestName() == null || payload.guestName().isBlank()) {
             throw new IllegalArgumentException("Nama tamu tidak boleh kosong");
         }
@@ -39,7 +39,7 @@ public class GreetingServiceImpl implements GreetingService {
                 .audioUrl(audioUrl)
                 .createdAt(LocalDateTime.now())
                 .build();
-        return greetingRepository.save(greeting);
+        return greetingRepository.save(greeting).toResponse();
     }
 
     @Override

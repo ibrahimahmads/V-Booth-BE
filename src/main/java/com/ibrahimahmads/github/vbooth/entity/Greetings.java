@@ -31,6 +31,7 @@ public class Greetings {
 
     public GreetingsResponse toResponse() {
         return GreetingsResponse.builder()
+                .id(id)
                 .guestName(guestName)
                 .photoUrl(photoUrl)
                 .audioUrl(audioUrl)
