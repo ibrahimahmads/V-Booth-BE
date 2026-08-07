@@ -1,15 +1,21 @@
 package com.ibrahimahmads.github.vbooth.service.impl;
 
 import com.ibrahimahmads.github.vbooth.dto.request.GreetingRequest;
+import com.ibrahimahmads.github.vbooth.dto.response.DownloadPhotoResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.GreetingsResponse;
 import com.ibrahimahmads.github.vbooth.entity.Greetings;
 import com.ibrahimahmads.github.vbooth.repository.GreetingRepository;
 import com.ibrahimahmads.github.vbooth.service.CloudinaryService;
 import com.ibrahimahmads.github.vbooth.service.GreetingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -79,5 +85,20 @@ public class GreetingServiceImpl implements GreetingService {
         cloudinaryService.deleteFile(greetings.getPhotoUrl(), "image");
         cloudinaryService.deleteFile(greetings.getAudioUrl(), "video");
         greetingRepository.delete(greetings);
+    }
+
+    @Override
+    public DownloadPhotoResponse downloadPhoto(UUID id) throws IOException {
+        GreetingsResponse greeting = getById(id);
+        String hdCloudinaryUrl = greeting.getPhotoUrl().replace("/upload/", "/upload/q_100,f_png/");
+        URL url = URI.create(hdCloudinaryUrl).toURL();
+        InputStream inputStream = url.openStream();
+        String fileName = "vbooth-greeting-" + greeting.getGuestName() + ".png";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
+        return DownloadPhotoResponse.builder()
+                .inputStream(inputStream)
+                .headers(headers)
+                .build();
     }
 }

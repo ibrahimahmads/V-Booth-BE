@@ -1,10 +1,12 @@
 package com.ibrahimahmads.github.vbooth.controller;
 
 import com.ibrahimahmads.github.vbooth.dto.request.GreetingRequest;
+import com.ibrahimahmads.github.vbooth.dto.response.DownloadPhotoResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.GreetingsResponse;
 import com.ibrahimahmads.github.vbooth.entity.Greetings;
 import com.ibrahimahmads.github.vbooth.service.GreetingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +52,18 @@ public class GreetingController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         greetingService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<InputStreamResource> downloadHDPhoto(@PathVariable UUID id) {
+        try {
+            DownloadPhotoResponse response = greetingService.downloadPhoto(id);
+            return ResponseEntity.ok()
+                    .headers(response.getHeaders())
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(new InputStreamResource(response.getInputStream()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
