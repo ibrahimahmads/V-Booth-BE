@@ -1,6 +1,7 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
 import com.ibrahimahmads.github.vbooth.dto.response.GreetingsResponse;
+import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.DateUtil;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +10,6 @@ import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Greetings {
+public class Greetings extends BaseCreatedEntity {
     @Id
     @GeneratedValue
     @UuidGenerator
@@ -27,7 +27,6 @@ public class Greetings {
     private String guestName;
     private String photoUrl;
     private String audioUrl;
-    private LocalDateTime createdAt;
 
     public GreetingsResponse toResponse() {
         return GreetingsResponse.builder()
@@ -35,8 +34,8 @@ public class Greetings {
                 .guestName(guestName)
                 .photoUrl(photoUrl)
                 .audioUrl(audioUrl)
-                .tgl(DateUtil.formatDate(createdAt))
-                .jam(DateUtil.formatTime(createdAt))
+                .tgl(DateUtil.formatDate(this.getCreatedAt()))
+                .jam(DateUtil.formatTime(this.getCreatedAt()))
                 .build();
     }
 }

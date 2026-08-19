@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +36,6 @@ public class GreetingServiceImpl implements GreetingService {
                 .guestName(payload.guestName())
                 .photoUrl(photoUrl)
                 .audioUrl(audioUrl)
-                .createdAt(LocalDateTime.now())
                 .build();
         return greetingRepository.save(greeting).toResponse();
     }
