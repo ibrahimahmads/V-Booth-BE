@@ -1,7 +1,6 @@
 package com.ibrahimahmads.github.vbooth.controller;
 
 import com.ibrahimahmads.github.vbooth.dto.request.CreateAccountRequest;
-import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
 import com.ibrahimahmads.github.vbooth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AccountResponse> createAccount(CreateAccountRequest payload) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.createAccount(payload));
+    public ResponseEntity<String> createAccount(CreateAccountRequest payload) {
+        authService.createAccount(payload);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Account created successfully");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginEmail(CreateAccountRequest payload) {
+        authService.login(payload.email(), payload.password());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Login success");
     }
 }
