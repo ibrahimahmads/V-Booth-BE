@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(payload.email())
                 .password(passwordEncoder.encode(payload.password()))
                 .role(Roles.USER)
-                .emailVerified(false)
+                .isEmailVerified(false)
                 .build();
         accountService.save(account);
     }
@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
             Account existingAccountByEmail = accountService.getAccountByEmail(payload.getEmail());
             if(existingAccountByEmail != null){
                 existingAccountByEmail.setGoogleId(payload.getSubject());
-                existingAccountByEmail.setEmailVerified(payload.getEmailVerified());
+                existingAccountByEmail.setIsEmailVerified(payload.getEmailVerified());
                 accountService.save(existingAccountByEmail);
                 return existingAccountByEmail.toResponse();
             }else{
@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
                         .name(payload.get("name").toString())
                         .email(payload.getEmail())
                         .googleId(payload.getSubject())
-                        .emailVerified(payload.getEmailVerified())
+                        .isEmailVerified(payload.getEmailVerified())
                         .role(Roles.USER)
                         .build();
                 Account savedAccount = accountService.save(account);

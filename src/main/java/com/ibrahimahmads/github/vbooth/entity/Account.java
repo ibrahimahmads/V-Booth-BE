@@ -29,12 +29,15 @@ public class Account extends BaseEntity {
     private String email;
     @Column(unique = true)
     private String googleId;
-    private Boolean emailVerified;
+    private Boolean isEmailVerified;
 
     public AccountResponse toResponse() {
         return AccountResponse.builder()
+                .id(id)
                 .name(name)
                 .email(email)
+                .isEmailVerified(isEmailVerified)
+                .hasPassword(this.password != null && !this.password.isBlank())
                 .role(role.name())
                 .build();
     }
