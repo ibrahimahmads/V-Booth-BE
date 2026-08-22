@@ -4,11 +4,13 @@ import com.ibrahimahmads.github.vbooth.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, UUID> {
     Boolean existsByEmail(String email);
     Boolean existsByGoogleId(String googleId);
-    Account findByEmail(String email);
+    Optional<Account> findByEmail(String email);
+    Optional<Account> findByGoogleId(String googleId);
 }

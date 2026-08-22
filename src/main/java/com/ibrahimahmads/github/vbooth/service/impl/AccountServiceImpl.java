@@ -12,8 +12,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
 
     @Override
-    public void registerAccount(Account account) {
-        accountRepository.save(account);
+    public Account save(Account account) {
+        return accountRepository.save(account);
     }
 
     @Override
@@ -28,6 +28,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccountByEmail(String email) {
-        return accountRepository.findByEmail(email);
+        return accountRepository.findByEmail(email).orElse(null);
+    }
+
+    @Override
+    public Account getAccountByGoogleId(String googleId) {
+        return accountRepository.findByGoogleId(googleId).orElse(null);
     }
 }

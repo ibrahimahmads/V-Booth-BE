@@ -5,6 +5,7 @@ import com.ibrahimahmads.github.vbooth.entity.Account;
 public interface AccountService {
     Boolean isEmailExist(String email);
     Boolean isGoogleIdExist(String googleId);
-    void registerAccount(Account account);
+    Account save(Account account);
     Account getAccountByEmail(String email);
+    Account getAccountByGoogleId(String googleId);
 }

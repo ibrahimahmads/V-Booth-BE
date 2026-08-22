@@ -28,7 +28,7 @@ public class Account extends BaseEntity {
     @Column(unique = true)
     private String email;
     @Column(unique = true)
-    private String googlId;
+    private String googleId;
     private Boolean emailVerified;
 
     public AccountResponse toResponse() {
