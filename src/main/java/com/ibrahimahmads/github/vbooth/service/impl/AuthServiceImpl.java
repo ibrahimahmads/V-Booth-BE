@@ -26,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
 
         Account account = Account.builder()
                 .name(payload.name())
+                .username(payload.username())
                 .email(payload.email())
                 .password(passwordEncoder.encode(payload.password()))
                 .role(Roles.USER)

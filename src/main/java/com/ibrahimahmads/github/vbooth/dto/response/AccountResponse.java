@@ -14,6 +14,7 @@ import java.util.UUID;
 public class AccountResponse {
     private UUID id;
     private String name;
+    private String username;
     private String email;
     private Boolean isEmailVerified;
     private Boolean hasPassword;

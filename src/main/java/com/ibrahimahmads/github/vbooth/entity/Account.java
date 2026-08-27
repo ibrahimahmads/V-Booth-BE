@@ -22,6 +22,8 @@ public class Account extends BaseEntity {
     @UuidGenerator
     private UUID id;
     private String name;
+    @Column(unique = true)
+    private String username;
     private String password;
     @Enumerated(EnumType.STRING)
     private Roles role;
@@ -35,6 +37,7 @@ public class Account extends BaseEntity {
         return AccountResponse.builder()
                 .id(id)
                 .name(name)
+                .username(username)
                 .email(email)
                 .isEmailVerified(isEmailVerified)
                 .hasPassword(this.password != null && !this.password.isBlank())
