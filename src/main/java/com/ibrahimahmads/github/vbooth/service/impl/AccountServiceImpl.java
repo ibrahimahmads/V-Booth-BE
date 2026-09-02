@@ -46,8 +46,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponse getAccountById(UUID id) {
+    public AccountResponse getAccountResponseById(UUID id) {
         return getAccountOrThrowById(id).toResponse();
+    }
+
+    @Override
+    public Account getAccountEntityById(UUID id) {
+        return getAccountOrThrowById(id);
     }
 
     @Override

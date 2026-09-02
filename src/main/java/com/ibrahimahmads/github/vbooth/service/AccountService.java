@@ -15,7 +15,8 @@ public interface AccountService {
     Account save(Account account);
     Account getAccountByEmail(String email);
     Account getAccountByGoogleId(String googleId);
-    AccountResponse getAccountById(UUID id);
+    AccountResponse getAccountResponseById(UUID id);
+    Account getAccountEntityById(UUID id);
     void setInitialPassword(UUID accountId,SetInitialPasswordRequest payload);
     void setInitialUsername(UUID accountId, SetInitialUsernameRequest payload);
     void changePassword(UUID accountId,ChangePasswordRequest payload);
