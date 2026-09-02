@@ -52,14 +52,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void setInitialPassword(UUID accountId,SetInitialPasswordRequest payload) {
-        Account account = getAccountOrThrowById(payload.id());
+        Account account = getAccountOrThrowById(accountId);
         account.setPassword(passwordEncoder.encode(payload.password()));
         accountRepository.save(account);
     }
 
     @Override
     public void changePassword(UUID accountId,ChangePasswordRequest payload) {
-        Account account = getAccountOrThrowById(payload.id());
+        Account account = getAccountOrThrowById(accountId);
         if(!passwordEncoder.matches(payload.oldPassword(), account.getPassword())){
             throw new IllegalArgumentException("Password lama salah");
         }
