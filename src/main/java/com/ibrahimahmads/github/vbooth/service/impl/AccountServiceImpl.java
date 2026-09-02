@@ -78,6 +78,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void setInitialUsername(UUID accountId, SetInitialUsernameRequest payload) {
         Account account = getAccountOrThrowById(accountId);
+        account.setUsername(payload.username());
+        accountRepository.save(account);
     }
 
     @Override
