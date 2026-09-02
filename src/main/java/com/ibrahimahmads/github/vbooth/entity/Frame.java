@@ -1,9 +1,6 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -23,4 +20,7 @@ public class Frame {
     private UUID id;
     private String nameTheme;
     private String overlayUrl;
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
 }

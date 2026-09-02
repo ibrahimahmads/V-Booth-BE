@@ -3,10 +3,7 @@ package com.ibrahimahmads.github.vbooth.entity;
 import com.ibrahimahmads.github.vbooth.dto.response.GreetingsResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.helper.DateUtil;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -27,6 +24,9 @@ public class Greetings extends BaseCreatedEntity {
     private String guestName;
     private String photoUrl;
     private String audioUrl;
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
 
     public GreetingsResponse toResponse() {
         return GreetingsResponse.builder()

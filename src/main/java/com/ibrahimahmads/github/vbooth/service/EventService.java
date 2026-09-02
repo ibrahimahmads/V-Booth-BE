@@ -7,8 +7,9 @@ import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
 import java.util.UUID;
 
 public interface EventService {
-    EventResponse save(EventCreateRequest payload);
+    EventResponse save(UUID accountId,EventCreateRequest payload);
+    EventResponse getEventMeById(UUID id, UUID accountId);
     EventResponse getEventById(UUID id);
-    EventResponse update(UUID id, EventUpdateRequest payload);
-    void delete(UUID id);
+    EventResponse update(UUID accountId,UUID id, EventUpdateRequest payload);
+    void delete(UUID id, UUID accountId);
 }

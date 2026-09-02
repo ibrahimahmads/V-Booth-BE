@@ -1,5 +1,6 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.EventStatus;
@@ -11,6 +12,8 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -40,6 +43,12 @@ public class Event extends BaseCreatedEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
+    @OneToMany(mappedBy = "event")
+    @JsonIgnoreProperties("event")
+    private List<Frame> frameList = new ArrayList<>();
+    @OneToMany(mappedBy = "event")
+    @JsonIgnoreProperties("event")
+    private List<Greetings> greetingsList = new ArrayList<>();
 
     public EventResponse toResponse(){
         return EventResponse.builder()
