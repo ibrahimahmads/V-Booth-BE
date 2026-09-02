@@ -1,4 +1,4 @@
-package com.ibrahimahmads.github.vbooth.utils;
+package com.ibrahimahmads.github.vbooth.utils.helper;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -2,7 +2,7 @@ package com.ibrahimahmads.github.vbooth.entity;
 
 import com.ibrahimahmads.github.vbooth.dto.response.GreetingsResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
-import com.ibrahimahmads.github.vbooth.utils.DateUtil;
+import com.ibrahimahmads.github.vbooth.utils.helper.DateUtil;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
