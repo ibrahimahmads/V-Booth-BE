@@ -1,5 +1,6 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.Roles;
@@ -7,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +35,9 @@ public class Account extends BaseEntity {
     @Column(unique = true)
     private String googleId;
     private Boolean isEmailVerified;
+    @OneToMany(mappedBy = "account")
+    @JsonIgnoreProperties("account")
+    private List<Event> eventList = new ArrayList<>();
 
     public AccountResponse toResponse() {
         return AccountResponse.builder()
