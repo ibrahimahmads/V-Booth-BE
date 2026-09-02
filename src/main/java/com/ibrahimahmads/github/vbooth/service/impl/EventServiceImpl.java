@@ -3,6 +3,7 @@ package com.ibrahimahmads.github.vbooth.service.impl;
 import com.ibrahimahmads.github.vbooth.dto.request.EventCreateRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.EventUpdateRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
+import com.ibrahimahmads.github.vbooth.entity.Account;
 import com.ibrahimahmads.github.vbooth.entity.Event;
 import com.ibrahimahmads.github.vbooth.repository.EventRepository;
 import com.ibrahimahmads.github.vbooth.service.AccountService;
@@ -23,7 +24,31 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse save(UUID accountId, EventCreateRequest payload) {
-        return null;
+        Account account = accountService.getAccountEntityById(accountId);
+
+        if (payload.eventStartTime() != null && payload.eventEndTime() != null) {
+            if (!payload.eventStartTime().isBefore(payload.eventEndTime())) {
+                throw new IllegalArgumentException("Waktu mulai acara harus lebih awal dari waktu selesai");
+            }
+        }
+
+        if (eventRepository.existsBySlug(payload.slug().toLowerCase().trim())) {
+            throw new RuntimeException("Slug atau link event sudah digunakan, silakan pilih link lain");
+        }
+
+        Event event = Event.builder()
+                .eventName(payload.eventName())
+                .eventDescription(payload.eventDescription())
+                .eventDate(payload.eventDate())
+                .eventStartTime(payload.eventStartTime())
+                .eventEndTime(payload.eventEndTime())
+                .eventLocation(payload.eventLocation())
+                .eventType(payload.eventType())
+                .account(account)
+                .slug(payload.slug().toLowerCase().trim())
+                .eventStatus(EventStatus.DRAFT)
+                .build();
+        return eventRepository.save(event).toResponse();
     }
 
     @Override
