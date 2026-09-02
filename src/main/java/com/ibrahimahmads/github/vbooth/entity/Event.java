@@ -1,8 +1,10 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
+import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.EventStatus;
 import com.ibrahimahmads.github.vbooth.utils.enums.EventTypes;
+import com.ibrahimahmads.github.vbooth.utils.helper.DateUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -38,4 +40,18 @@ public class Event extends BaseCreatedEntity {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
+
+    public EventResponse toResponse(){
+        return EventResponse.builder()
+                .id(id)
+                .eventName(eventName)
+                .slug(slug)
+                .eventDescription(eventDescription)
+                .eventType(eventType)
+                .eventStatus(eventStatus)
+                .eventDate(DateUtil.formatDate(eventDate))
+                .eventStartTime(DateUtil.formatTime(eventStartTime))
+                .eventEndTime(DateUtil.formatTime(eventEndTime))
+                .build();
+    }
 }
