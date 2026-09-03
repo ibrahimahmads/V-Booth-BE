@@ -1,9 +1,26 @@
 package com.ibrahimahmads.github.vbooth.dto.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 public record CreateAccountRequest(
+        @NotBlank(message = "Nama tidak boleh kosong!!!")
         String name,
+        @NotBlank(message = "Username tidak boleh kosong!!!")
+        @Size(min = 3, max = 20, message = "Panjang username harus antara 3 dan 20 karakter")
         String username,
+        @NotBlank(message = "Email tidak boleh kosong!!!")
+        @Email(message = "Format email tidak valid")
+        @Size(max = 100, message = "Panjang email maksimal 100 karakter")
         String email,
+        @NotBlank(message = "Password tidak boleh kosong!!!")
+        @Size(min = 8, message = "Password harus memiliki panjang minimal 8 karakter")
+        @Pattern(
+                regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).*$",
+                message = "Password harus memiliki setidaknya 1 huruf kapital, 1 angka dan 1 karakter khusus"
+        )
         String password
 ) {
 }
