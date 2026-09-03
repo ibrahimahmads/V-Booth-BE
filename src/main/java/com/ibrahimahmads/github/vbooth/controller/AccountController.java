@@ -41,13 +41,13 @@ public class AccountController {
     public ResponseEntity<AccountResponse> getMyAccount(Authentication authentication){
         if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
         UserContext userContext = (UserContext) authentication.getPrincipal();
-        return ResponseEntity.ok(accountService.getAccountById(userContext.getAccountId()));
+        return ResponseEntity.ok(accountService.getAccountResponseById(userContext.getAccountId()));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponse> getMyAccount(@PathVariable UUID id){
-        return ResponseEntity.ok(accountService.getAccountById(id));
+        return ResponseEntity.ok(accountService.getAccountResponseById(id));
     }
 
     @PostMapping("set-initial-username")
