@@ -21,7 +21,7 @@ import java.util.UUID;
 public class AccountController {
     private final AccountService accountService;
 
-    @PostMapping("set-initial-password")
+    @PostMapping("/set-initial-password")
     public ResponseEntity<String> setInitialPassword(Authentication authentication,@RequestBody SetInitialPasswordRequest payload) {
         if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
         UserContext userContext = (UserContext) authentication.getPrincipal();
@@ -29,7 +29,7 @@ public class AccountController {
         return ResponseEntity.ok("Password set successfully");
     }
 
-    @PostMapping("change-password")
+    @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(Authentication authentication, @RequestBody ChangePasswordRequest payload) {
         if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
         UserContext userContext = (UserContext) authentication.getPrincipal();
@@ -37,7 +37,7 @@ public class AccountController {
         return ResponseEntity.ok("Password changed successfully");
     }
 
-    @GetMapping("me")
+    @GetMapping("/me")
     public ResponseEntity<AccountResponse> getMyAccount(Authentication authentication){
         if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
         UserContext userContext = (UserContext) authentication.getPrincipal();
@@ -50,7 +50,7 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAccountResponseById(id));
     }
 
-    @PostMapping("set-initial-username")
+    @PostMapping("/set-initial-username")
     public ResponseEntity<String> setInitialUsername(Authentication authentication, @RequestBody SetInitialUsernameRequest payload){
         if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
         UserContext userContext = (UserContext) authentication.getPrincipal();
@@ -58,7 +58,7 @@ public class AccountController {
         return ResponseEntity.ok("Username set successfully");
     }
 
-    @GetMapping("all")
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AccountResponse>> getAllAccounts(){
         return ResponseEntity.ok(accountService.getAll());

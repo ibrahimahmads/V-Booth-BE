@@ -123,4 +123,13 @@ public class EventServiceImpl implements EventService {
         eventRepository.delete(event);
     }
 
+    @Override
+    public List<EventResponse> getAll() {
+        return eventRepository.findAll().stream().map(Event::toResponse).toList();
+    }
+
+    @Override
+    public List<EventResponse> getAllByAccountId(UUID accountId) {
+        return eventRepository.findAllByAccount_Id(accountId).stream().map(Event::toResponse).toList();
+    }
 }
