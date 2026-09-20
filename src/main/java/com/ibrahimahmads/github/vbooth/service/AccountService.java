@@ -22,4 +22,5 @@ public interface AccountService {
     void changePassword(UUID accountId,ChangePasswordRequest payload);
     List<AccountResponse> getAll();
     void deleteById(UUID id);
+    Account getAccountByEmailOrUsername(String emailOrUsername);
 }

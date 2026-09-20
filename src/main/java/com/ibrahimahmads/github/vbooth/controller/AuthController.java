@@ -1,8 +1,8 @@
 package com.ibrahimahmads.github.vbooth.controller;
 
 import com.ibrahimahmads.github.vbooth.dto.request.CreateAccountRequest;
-import com.ibrahimahmads.github.vbooth.dto.request.GoogleAuthRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.LoginRequest;
+import com.ibrahimahmads.github.vbooth.dto.response.LoginResponse;
 import com.ibrahimahmads.github.vbooth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,14 +25,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginEmail(@RequestBody LoginRequest payload) {
-        authService.login(payload.email(), payload.password());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Login success");
+    public ResponseEntity<LoginResponse> loginEmail(@RequestBody LoginRequest payload) {
+        return ResponseEntity.status(HttpStatus.OK).body(authService.login(payload));
     }
 
-    @PostMapping("/google")
-    public ResponseEntity<String> loginOrRegisterWithGoogle(@RequestBody GoogleAuthRequest payload) {
-        authService.authenticateWithGoogle(payload.googleIdToken());
-        return ResponseEntity.status(HttpStatus.CREATED).body("Login atau Register success");
-    }
 }

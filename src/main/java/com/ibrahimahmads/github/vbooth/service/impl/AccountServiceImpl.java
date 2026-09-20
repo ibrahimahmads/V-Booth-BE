@@ -96,4 +96,9 @@ public class AccountServiceImpl implements AccountService {
     public void deleteById(UUID id) {
         accountRepository.deleteById(id);
     }
+
+    @Override
+    public Account getAccountByEmailOrUsername(String emailOrUsername) {
+        return accountRepository.findByUsernameOrEmail(emailOrUsername,emailOrUsername).orElseThrow(()-> new RuntimeException("Account not found"));
+    }
 }
