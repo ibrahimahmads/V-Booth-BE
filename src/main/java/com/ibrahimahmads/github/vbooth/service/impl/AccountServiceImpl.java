@@ -31,6 +31,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Boolean isUsernameExist(String username) {
+        return accountRepository.existsByUsername(username);
+    }
+
+    @Override
     public Boolean isGoogleIdExist(String googleId) {
         return accountRepository.existsByGoogleId(googleId);
     }

@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public interface AccountService {
     Boolean isEmailExist(String email);
+    Boolean isUsernameExist(String username);
     Boolean isGoogleIdExist(String googleId);
     Account save(Account account);
     Account getAccountByEmail(String email);

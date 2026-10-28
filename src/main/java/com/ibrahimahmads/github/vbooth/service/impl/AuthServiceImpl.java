@@ -28,6 +28,10 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Email sudah terdaftar");
         }
 
+        if(accountService.isUsernameExist(payload.username())){
+            throw new IllegalArgumentException("Username sudah terdaftar");
+        }
+
         Account account = Account.builder()
                 .name(payload.name())
                 .username(payload.username())
