@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private Long expiration;
+
+    @Value("${jwt.access-token-cookie-name}")
+    private String cokieName;
 
     private Key getSigningKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -53,6 +57,26 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
+    }
+
+    public ResponseCookie generateJwtCookie(String token) {
+        return ResponseCookie.from(cokieName, token)
+                .httpOnly(true)
+                .secure(false) // Ubah jadi true jika sudah production dengan HTTPS
+                .path("/")
+                .maxAge(24 * 60 * 60) // Berlaku selama 1 hari (dalam detik)
+                .sameSite("Lax") // Bisa "Strict" atau "Lax"
+                .build();
+    }
+
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie.from(cokieName, "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0) // Langsung kadaluarsa
+                .sameSite("Lax")
+                .build();
     }
 }
 

@@ -9,6 +9,7 @@ import com.ibrahimahmads.github.vbooth.service.AccountService;
 import com.ibrahimahmads.github.vbooth.service.AuthService;
 import com.ibrahimahmads.github.vbooth.utils.enums.Roles;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,14 +48,20 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest payload) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        payload.emailOrUsername(), payload.password()
+                        payload.usernameOrEmail(), payload.password()
                 )
         );
-        Account account = accountService.getAccountByEmailOrUsername(payload.emailOrUsername());
+        Account account = accountService.getAccountByEmailOrUsername(payload.usernameOrEmail());
         String token = jwtUtil.generateToken(authentication);
+        ResponseCookie cookie = jwtUtil.generateJwtCookie(token);
         return LoginResponse.builder()
                 .account(account.toResponse())
-                .token(token)
+                .jwtCookie(cookie)
                 .build();
+    }
+
+    @Override
+    public ResponseCookie logout() {
+        return jwtUtil.getCleanJwtCookie();
     }
 }
