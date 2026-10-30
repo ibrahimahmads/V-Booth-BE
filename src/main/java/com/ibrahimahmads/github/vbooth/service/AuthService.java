@@ -9,5 +9,4 @@ import org.springframework.http.ResponseCookie;
 public interface AuthService {
     void createAccount(CreateAccountRequest payload);
     LoginResponse login(LoginRequest payload);
-    ResponseCookie logout();
 }

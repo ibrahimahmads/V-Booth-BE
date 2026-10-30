@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -26,20 +27,39 @@ public class JwtUtil {
 
     @Value("${jwt.access-token-cookie-name}")
     private String cokieName;
+    @Value("${app.cookie.secure}")
+    private Boolean cokieSecure;
+    @Value("${app.cookie.same-site}")
+    private String cokieSameSite;
 
     private Key getSigningKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(Authentication authentication) {
-        UserContext userContext = (UserContext) authentication.getPrincipal();
-        List<String> roles = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+        Object principal = authentication.getPrincipal();
+        String username;
+        UUID accountId;
+        List<String> roles;
+
+        // Cek apakah login dari OAuth2 (Google) atau login biasa
+        if (principal instanceof com.ibrahimahmads.github.vbooth.security.model.CustomOAuth2User oAuth2User) {
+            username = oAuth2User.getAccount().getEmail(); // Atau oAuth2User.getName() sesuai field di CustomOAuth2User kamu
+            accountId = oAuth2User.getAccount().getId(); // Ambil ID dari account entity
+            roles = List.of(oAuth2User.getAccount().getRole().name()); // Ambil role
+        } else {
+            // Login biasa (UserContext / UserDetails)
+            UserContext userContext = (UserContext) principal;
+            username = authentication.getName();
+            accountId = userContext.getAccountId();
+            roles = authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+        }
 
         return Jwts.builder()
-                .subject(authentication.getName())
-                .claim("accountId", userContext.getAccountId())
+                .subject(username)
+                .claim("accountId", accountId)
                 .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
@@ -62,21 +82,10 @@ public class JwtUtil {
     public ResponseCookie generateJwtCookie(String token) {
         return ResponseCookie.from(cokieName, token)
                 .httpOnly(true)
-                .secure(false) // Ubah jadi true jika sudah production dengan HTTPS
+                .secure(cokieSecure)
                 .path("/")
-                .maxAge(24 * 60 * 60) // Berlaku selama 1 hari (dalam detik)
-                .sameSite("Lax") // Bisa "Strict" atau "Lax"
-                .build();
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        return ResponseCookie.from(cokieName, "")
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(0) // Langsung kadaluarsa
-                .sameSite("Lax")
+                .maxAge(24 * 60 * 60)
+                .sameSite(cokieSameSite)
                 .build();
     }
 }
-

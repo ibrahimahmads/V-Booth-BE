@@ -59,9 +59,4 @@ public class AuthServiceImpl implements AuthService {
                 .jwtCookie(cookie)
                 .build();
     }
-
-    @Override
-    public ResponseCookie logout() {
-        return jwtUtil.getCleanJwtCookie();
-    }
 }

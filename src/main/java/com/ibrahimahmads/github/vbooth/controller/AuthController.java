@@ -31,10 +31,4 @@ public class AuthController {
         LoginResponse loginResponse = authService.login(payload);
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE,loginResponse.getJwtCookie().toString()).body(loginResponse.getAccount());
     }
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE,authService.logout().toString()).body("Logout successfully");
-    }
-
 }
