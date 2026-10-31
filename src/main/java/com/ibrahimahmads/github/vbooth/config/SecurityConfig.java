@@ -3,8 +3,6 @@ package com.ibrahimahmads.github.vbooth.config;
 import com.ibrahimahmads.github.vbooth.security.jwt.JwtAccessDeniedHandler;
 import com.ibrahimahmads.github.vbooth.security.jwt.JwtAuthEntryPoint;
 import com.ibrahimahmads.github.vbooth.security.jwt.JwtFilter;
-import com.ibrahimahmads.github.vbooth.security.service.CustomOAuth2UserService;
-import com.ibrahimahmads.github.vbooth.security.service.OAuth2LoginSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +27,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     @Value("${jwt.access-token-cookie-name}")
     private String cokieName;
 
@@ -65,15 +61,6 @@ public class SecurityConfig {
                                 "/error/**"
                         ).permitAll()
                         .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                    .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                    .successHandler(oAuth2LoginSuccessHandler)
-                    .failureHandler((request, response, exception) -> {
-                        exception.printStackTrace(); // lihat di console IntelliJ
-                        response.sendRedirect("http://localhost:5173/login?error="
-                            + java.net.URLEncoder.encode(exception.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
-                    })
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout

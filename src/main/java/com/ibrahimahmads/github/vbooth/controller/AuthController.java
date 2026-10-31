@@ -1,10 +1,12 @@
 package com.ibrahimahmads.github.vbooth.controller;
 
 import com.ibrahimahmads.github.vbooth.dto.request.CreateAccountRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.GoogleAuthRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.LoginRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.LoginResponse;
 import com.ibrahimahmads.github.vbooth.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AccountResponse> loginEmail(@RequestBody LoginRequest payload) {
-        LoginResponse loginResponse = authService.login(payload);
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE,loginResponse.getJwtCookie().toString()).body(loginResponse.getAccount());
+        LoginResponse res = authService.login(payload);
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE,res.getJwtCookie().toString())
+                .body(res.getAccount());
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AccountResponse> googleLogin(@Valid @RequestBody GoogleAuthRequest request) {
+        LoginResponse res = authService.loginWithGoogle(request);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, res.getJwtCookie().toString())
+                .body(res.getAccount());
     }
 }

@@ -1,12 +1,14 @@
 package com.ibrahimahmads.github.vbooth.service.impl;
 
 import com.ibrahimahmads.github.vbooth.dto.request.CreateAccountRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.GoogleAuthRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.LoginRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.LoginResponse;
 import com.ibrahimahmads.github.vbooth.entity.Account;
 import com.ibrahimahmads.github.vbooth.security.jwt.JwtUtil;
 import com.ibrahimahmads.github.vbooth.service.AccountService;
 import com.ibrahimahmads.github.vbooth.service.AuthService;
+import com.ibrahimahmads.github.vbooth.service.GoogleAuthService;
 import com.ibrahimahmads.github.vbooth.utils.enums.Roles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -16,10 +18,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final AccountService accountService;
+    private final GoogleAuthService googleAuthService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -53,6 +58,18 @@ public class AuthServiceImpl implements AuthService {
         );
         Account account = accountService.getAccountByEmailOrUsername(payload.usernameOrEmail());
         String token = jwtUtil.generateToken(authentication);
+        ResponseCookie cookie = jwtUtil.generateJwtCookie(token);
+        return LoginResponse.builder()
+                .account(account.toResponse())
+                .jwtCookie(cookie)
+                .build();
+    }
+
+    @Override
+    public LoginResponse loginWithGoogle(GoogleAuthRequest payload) {
+        Account account = googleAuthService.loginWithCode(payload.code());
+        String token = jwtUtil.generateToken(
+                account.getEmail(), account.getId(), List.of(account.getRole().name()));
         ResponseCookie cookie = jwtUtil.generateJwtCookie(token);
         return LoginResponse.builder()
                 .account(account.toResponse())

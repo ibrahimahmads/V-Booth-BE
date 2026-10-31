@@ -7,6 +7,7 @@ import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
 import com.ibrahimahmads.github.vbooth.entity.Account;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AccountService {
@@ -14,8 +15,8 @@ public interface AccountService {
     Boolean isUsernameExist(String username);
     Boolean isGoogleIdExist(String googleId);
     Account save(Account account);
-    Account getAccountByEmail(String email);
-    Account getAccountByGoogleId(String googleId);
+    Optional<Account> getAccountByEmail(String email);
+    Optional<Account> getAccountByGoogleId(String googleId);
     AccountResponse getAccountResponseById(UUID id);
     Account getAccountEntityById(UUID id);
     void setInitialPassword(UUID accountId,SetInitialPasswordRequest payload);

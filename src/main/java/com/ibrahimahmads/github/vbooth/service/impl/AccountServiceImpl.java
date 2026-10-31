@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,13 +42,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountByEmail(String email) {
-        return accountRepository.findByEmail(email).orElse(null);
+    public Optional<Account> getAccountByEmail(String email) {
+        return accountRepository.findByEmail(email);
     }
 
     @Override
-    public Account getAccountByGoogleId(String googleId) {
-        return accountRepository.findByGoogleId(googleId).orElse(null);
+    public Optional<Account> getAccountByGoogleId(String googleId) {
+        return accountRepository.findByGoogleId(googleId);
     }
 
     @Override

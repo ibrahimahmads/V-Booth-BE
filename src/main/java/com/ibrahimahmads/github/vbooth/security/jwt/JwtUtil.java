@@ -37,26 +37,15 @@ public class JwtUtil {
     }
 
     public String generateToken(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-        String username;
-        UUID accountId;
-        List<String> roles;
+        UserContext userContext = (UserContext) authentication.getPrincipal();
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
-        // Cek apakah login dari OAuth2 (Google) atau login biasa
-        if (principal instanceof com.ibrahimahmads.github.vbooth.security.model.CustomOAuth2User oAuth2User) {
-            username = oAuth2User.getAccount().getEmail(); // Atau oAuth2User.getName() sesuai field di CustomOAuth2User kamu
-            accountId = oAuth2User.getAccount().getId(); // Ambil ID dari account entity
-            roles = List.of(oAuth2User.getAccount().getRole().name()); // Ambil role
-        } else {
-            // Login biasa (UserContext / UserDetails)
-            UserContext userContext = (UserContext) principal;
-            username = authentication.getName();
-            accountId = userContext.getAccountId();
-            roles = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
-        }
+        return generateToken(authentication.getName(), userContext.getAccountId(), roles);
+    }
 
+    public String generateToken(String username, UUID accountId, List<String> roles) {
         return Jwts.builder()
                 .subject(username)
                 .claim("accountId", accountId)
