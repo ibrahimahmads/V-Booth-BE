@@ -1,6 +1,7 @@
 package com.ibrahimahmads.github.vbooth.service;
 
 import com.ibrahimahmads.github.vbooth.dto.request.ChangePasswordRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.EditAccountRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.SetInitialPasswordRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.SetInitialUsernameRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
@@ -25,4 +26,5 @@ public interface AccountService {
     List<AccountResponse> getAll();
     void deleteById(UUID id);
     Account getAccountByEmailOrUsername(String emailOrUsername);
+    AccountResponse editProfile(UUID accountId, EditAccountRequest payload);
 }

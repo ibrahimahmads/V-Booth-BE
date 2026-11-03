@@ -1,6 +1,7 @@
 package com.ibrahimahmads.github.vbooth.service.impl;
 
 import com.ibrahimahmads.github.vbooth.dto.request.ChangePasswordRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.EditAccountRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.SetInitialPasswordRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.SetInitialUsernameRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
@@ -106,5 +107,19 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account getAccountByEmailOrUsername(String emailOrUsername) {
         return accountRepository.findByUsernameOrEmail(emailOrUsername,emailOrUsername).orElseThrow(()-> new RuntimeException("Account not found"));
+    }
+
+    @Override
+    public AccountResponse editProfile(UUID accountId, EditAccountRequest payload) {
+        Account account = getAccountOrThrowById(accountId);
+        if(!isUsernameExist(payload.username())){
+            account.setUsername(payload.username());
+        }
+        if(!isEmailExist(payload.email())){
+            account.setEmail(payload.email());
+            account.setIsEmailVerified(false);
+        }
+        account.setName(payload.name());
+        return accountRepository.save(account).toResponse();
     }
 }

@@ -39,9 +39,9 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Account account = Account.builder()
-                .name(payload.name())
-                .username(payload.username())
-                .email(payload.email())
+                .name(payload.name().trim())
+                .username(payload.username().trim().toLowerCase())
+                .email(payload.email().trim().toLowerCase())
                 .password(passwordEncoder.encode(payload.password()))
                 .role(Roles.USER)
                 .isEmailVerified(false)
@@ -51,12 +51,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest payload) {
+        String usernameOrEmail = payload.usernameOrEmail().trim().toLowerCase();
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        payload.usernameOrEmail(), payload.password()
+                        usernameOrEmail, payload.password()
                 )
         );
-        Account account = accountService.getAccountByEmailOrUsername(payload.usernameOrEmail());
+        Account account = accountService.getAccountByEmailOrUsername(usernameOrEmail);
         String token = jwtUtil.generateToken(authentication);
         ResponseCookie cookie = jwtUtil.generateJwtCookie(token);
         return LoginResponse.builder()

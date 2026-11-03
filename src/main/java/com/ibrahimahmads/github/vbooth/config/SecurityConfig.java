@@ -48,10 +48,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/api/v1/frames/**",
-                                "/api/v1/account/**",
-                                "/api/v1/greetings/**",
+                                "/api/v1/**",
                                 "/login",
                                 "/login/**",
                                 "/oauth2/**",

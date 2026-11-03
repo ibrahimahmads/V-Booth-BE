@@ -23,6 +23,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -62,8 +63,8 @@ public class GoogleAuthServiceImpl implements GoogleAuthService {
         Jwt idToken = exchangeAndVerify(code);
 
         String googleId = idToken.getSubject();
-        String email = idToken.getClaimAsString("email");
-        String name = idToken.getClaimAsString("name");
+        String email = idToken.getClaimAsString("email").toLowerCase();
+        String name = idToken.getClaimAsString("name").toLowerCase();
         boolean emailVerified = Boolean.TRUE.equals(idToken.getClaimAsBoolean("email_verified"));
 
         if (email == null || !emailVerified) {

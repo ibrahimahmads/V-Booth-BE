@@ -1,12 +1,14 @@
 package com.ibrahimahmads.github.vbooth.controller;
 
 import com.ibrahimahmads.github.vbooth.dto.request.ChangePasswordRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.EditAccountRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.SetInitialPasswordRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.SetInitialUsernameRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
 import com.ibrahimahmads.github.vbooth.security.model.UserContext;
 import com.ibrahimahmads.github.vbooth.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -69,5 +71,12 @@ public class AccountController {
     public ResponseEntity<String> deleteAccount(@PathVariable UUID id){
         accountService.deleteById(id);
         return ResponseEntity.ok("Account deleted successfully");
+    }
+
+    @PutMapping("/edit/me")
+    public ResponseEntity<AccountResponse> editMyProfil(Authentication authentication, @RequestBody EditAccountRequest payload){
+        if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
+        UserContext userContext = (UserContext) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.editProfile(userContext.getAccountId(),payload));
     }
 }
