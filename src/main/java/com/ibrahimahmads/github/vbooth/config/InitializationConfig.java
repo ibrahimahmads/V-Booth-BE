@@ -1,10 +1,16 @@
 package com.ibrahimahmads.github.vbooth.config;
 
+import com.ibrahimahmads.github.vbooth.entity.Account;
 import com.ibrahimahmads.github.vbooth.entity.Paket;
 import com.ibrahimahmads.github.vbooth.repository.PaketRepository;
+import com.ibrahimahmads.github.vbooth.service.AccountService;
 import com.ibrahimahmads.github.vbooth.service.PaketService;
+import com.ibrahimahmads.github.vbooth.utils.enums.Roles;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.TimeZone;
@@ -13,10 +19,21 @@ import java.util.TimeZone;
 @RequiredArgsConstructor
 public class InitializationConfig {
     private final PaketRepository paketRepository;
+    private final AccountService accountService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${vbooth.admin.password}")
+    private String passAdmin;
+    @Value("${vbooth.admin.email}")
+    private String emailAdmin;
+    @Value("${vbooth.admin.username}")
+    private String usernameAdmin;
+
     @PostConstruct
     public void init(){
         initTimezone();
         initPaket();
+        initAdmin();
     }
 
     void initTimezone(){
@@ -62,6 +79,20 @@ public class InitializationConfig {
                     .isUrlSlug(true)
                     .build();
             paketRepository.save(paket);
+        }
+    }
+
+    void initAdmin(){
+        if(!accountService.isUsernameExist(usernameAdmin)){
+            Account account = Account.builder()
+                    .name(StringUtils.capitalize(usernameAdmin))
+                    .username(usernameAdmin)
+                    .role(Roles.ADMIN)
+                    .isEmailVerified(true)
+                    .password(passwordEncoder.encode(passAdmin))
+                    .email(emailAdmin)
+                    .build();
+            accountService.save(account);
         }
     }
 }
