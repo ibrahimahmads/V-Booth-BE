@@ -6,15 +6,13 @@ import com.ibrahimahmads.github.vbooth.dto.request.LoginRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.AccountResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.LoginResponse;
 import com.ibrahimahmads.github.vbooth.service.AuthService;
+import com.ibrahimahmads.github.vbooth.utils.enums.Roles;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,8 +27,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AccountResponse> loginEmail(@RequestBody LoginRequest payload) {
-        LoginResponse res = authService.login(payload);
+    public ResponseEntity<AccountResponse> loginEmail(@RequestBody LoginRequest payload, @RequestParam Roles loginType) {
+        LoginResponse res = authService.login(payload, loginType);
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE,res.getJwtCookie().toString())
                 .body(res.getAccount());

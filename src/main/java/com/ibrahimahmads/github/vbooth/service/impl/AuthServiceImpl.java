@@ -12,6 +12,7 @@ import com.ibrahimahmads.github.vbooth.service.GoogleAuthService;
 import com.ibrahimahmads.github.vbooth.utils.enums.Roles;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequest payload) {
+    public LoginResponse login(LoginRequest payload, Roles loginType) {
         String usernameOrEmail = payload.usernameOrEmail().trim().toLowerCase();
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -58,6 +59,19 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
         Account account = accountService.getAccountByEmailOrUsername(usernameOrEmail);
+        if (Roles.USER.equals(loginType)
+                && account.getRole() != Roles.USER) {
+            throw new AccessDeniedException(
+                    "Akses ditolak. Halaman ini hanya diperuntukkan bagi pengguna biasa."
+            );
+        }
+
+        if (Roles.ADMIN.equals(loginType)
+                && account.getRole() != Roles.ADMIN) {
+            throw new AccessDeniedException(
+                    "Akun ini tidak memiliki akses administrator."
+            );
+        }
         String token = jwtUtil.generateToken(authentication);
         ResponseCookie cookie = jwtUtil.generateJwtCookie(token);
         return LoginResponse.builder()
