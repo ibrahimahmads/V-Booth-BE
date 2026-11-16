@@ -40,6 +40,7 @@ public class AccountController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AccountResponse> getMyAccount(Authentication authentication){
         if(authentication.getPrincipal() == null ) throw new NullPointerException("login first to access this resource");
         UserContext userContext = (UserContext) authentication.getPrincipal();

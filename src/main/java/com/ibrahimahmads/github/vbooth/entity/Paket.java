@@ -27,7 +27,7 @@ public class Paket extends BaseEntity {
     private Integer eventActivePeriod;
     private Integer galeryActivePeriod;
     private Integer maxGuest;
-    private Integer price;
+    private Long price;
     private Boolean isCanPhotoAndVoice;
     private Boolean isUrlSlug;
 }

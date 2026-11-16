@@ -49,6 +49,9 @@ public class Event extends BaseCreatedEntity {
     @OneToMany(mappedBy = "event")
     @JsonIgnoreProperties("event")
     private List<Greetings> greetingsList = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "paket_id")
+    private Paket paket;
 
     public EventResponse toResponse(){
         return EventResponse.builder()

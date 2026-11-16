@@ -6,6 +6,6 @@ public record PaketRequest(
         Integer eventActivePeriod,
         Integer galeryActivePeriod,
         Integer maxGuest,
-        Integer price
+        Long price
 ) {
 }

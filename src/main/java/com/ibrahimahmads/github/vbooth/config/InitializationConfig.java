@@ -44,7 +44,7 @@ public class InitializationConfig {
         if(!paketRepository.existsByName("Intimate")){
             Paket paket = Paket.builder()
                     .name("Intimate")
-                    .price(150000)
+                    .price(150000L)
                     .description("Cocok untuk acara intim")
                     .maxGuest(150)
                     .eventActivePeriod(1)
@@ -57,7 +57,7 @@ public class InitializationConfig {
         if(!paketRepository.existsByName("Celebration")){
             Paket paket = Paket.builder()
                     .name("Celebration")
-                    .price(300000)
+                    .price(300000L)
                     .description("Untuk resepsi & acara besar")
                     .maxGuest(300)
                     .eventActivePeriod(1)
@@ -70,7 +70,7 @@ public class InitializationConfig {
         if(!paketRepository.existsByName("Enterprise")){
             Paket paket = Paket.builder()
                     .name("Enterprise")
-                    .price(450000)
+                    .price(450000L)
                     .description("Untuk gathering & acara perusahaan")
                     .maxGuest(500)
                     .eventActivePeriod(1)

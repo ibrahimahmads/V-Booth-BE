@@ -1,0 +1,48 @@
+package com.ibrahimahmads.github.vbooth.entity;
+
+import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
+import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "t_orders")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Orders extends BaseCreatedEntity {
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    private UUID id;
+    @Column(nullable = false, unique = true)
+    private String orderNumber;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private Long amount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+
+    @Column(nullable = false)
+    private LocalDateTime expiredAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", unique = true)
+    private Event event;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "paket_id", nullable = false)
+    private Paket paket;
+}
