@@ -9,10 +9,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Orders, UUID> {
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
     UPDATE Orders o
     SET o.status = :expiredStatus
@@ -25,4 +26,9 @@ public interface OrderRepository extends JpaRepository<Orders, UUID> {
             @Param("now") LocalDateTime now
     );
     List<Orders> findAllByAccountId(UUID accountId);
+    Optional<Orders> findByIdAndAccountId(UUID id, UUID accountId);
+    Optional<Orders> findByAccountIdAndPaketIdAndStatus(UUID accountId, UUID paketId, OrderStatus status);
+    Optional<OrderStatus> getStatusByOrderNumber(String orderNumber);
+    Optional<Orders> findByOrderNumberAndAccountId(String orderNumber, UUID accountId);
+    Optional<Orders> findOrdersByOrderNumber(String orderNumber);
 }

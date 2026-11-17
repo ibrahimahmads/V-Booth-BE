@@ -1,5 +1,6 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
+import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
 import jakarta.persistence.*;
@@ -23,8 +24,6 @@ public class Orders extends BaseCreatedEntity {
     private UUID id;
     @Column(nullable = false, unique = true)
     private String orderNumber;
-
-    @Column(nullable = false, precision = 12, scale = 2)
     private Long amount;
 
     @Enumerated(EnumType.STRING)
@@ -33,6 +32,14 @@ public class Orders extends BaseCreatedEntity {
 
     @Column(nullable = false)
     private LocalDateTime expiredAt;
+
+    private LocalDateTime paidAt;
+
+    @Column(length = 1000)
+    private String qrUrl;
+
+    @Column(length = 50)
+    private String paymentMethod;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
@@ -45,4 +52,15 @@ public class Orders extends BaseCreatedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paket_id", nullable = false)
     private Paket paket;
+
+    public OrderResponse toResponse(){
+        return OrderResponse.builder()
+                .id(id)
+                .orderNumber(orderNumber)
+                .amount(amount)
+                .orderStatus(status)
+                .expiredAt(String.valueOf(expiredAt))
+                .qrUrl(qrUrl)
+                .build();
+    }
 }

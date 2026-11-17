@@ -38,7 +38,7 @@ public class MidtransPaymentGateway implements PaymentGateway{
                         "acquirer", "gopay"
                 ),
                 "custom_expiry", Map.of(
-                        "expiry_duration", 15,
+                        "expiry_duration", 60,
                         "unit", "minute"
                 )
         );
@@ -61,6 +61,9 @@ public class MidtransPaymentGateway implements PaymentGateway{
             throw new IllegalStateException(
                     "Response Midtrans kosong"
             );
+        }
+        if (!"201".equals(midtrans.getStatusCode())) {
+            throw new IllegalStateException("Midtrans menolak: " + midtrans.getStatusMessage());
         }
 
         String qrUrl = midtrans.getActions()
