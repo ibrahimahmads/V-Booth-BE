@@ -6,6 +6,7 @@ import com.ibrahimahmads.github.vbooth.service.OrderStreamService;
 import com.ibrahimahmads.github.vbooth.sse.OrderSseRegistry;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -18,6 +19,9 @@ import java.util.UUID;
 public class OrderStreamServiceImpl implements OrderStreamService {
     private final OrderService orderService;
     private final OrderSseRegistry registry;
+
+    @Value("${order.expire-grace-time}")
+    private long graceMinutes;
 
     @Override
     public SseEmitter subscribe(String orderNumber, UUID accountId) {
@@ -37,6 +41,7 @@ public class OrderStreamServiceImpl implements OrderStreamService {
             return Duration.ofSeconds(10).toMillis();
         }
         long remaining = Duration.between(LocalDateTime.now(), order.getExpiredAt()).toMillis();
-        return Math.max(remaining + Duration.ofMinutes(2).toMillis(), Duration.ofMinutes(1).toMillis());
+        long buffer = Duration.ofMinutes(graceMinutes + 2).toMillis();   // masa tenggang + jeda scheduler
+        return Math.max(remaining + buffer, Duration.ofMinutes(1).toMillis());
     }
 }

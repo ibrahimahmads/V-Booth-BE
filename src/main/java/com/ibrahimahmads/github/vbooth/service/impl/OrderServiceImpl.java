@@ -6,15 +6,22 @@ import com.ibrahimahmads.github.vbooth.dto.response.QrisPaymentResponse;
 import com.ibrahimahmads.github.vbooth.entity.Account;
 import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.entity.Paket;
+import com.ibrahimahmads.github.vbooth.event.OrderStatusChangeEvent;
 import com.ibrahimahmads.github.vbooth.gateway.PaymentGateway;
 import com.ibrahimahmads.github.vbooth.repository.OrderRepository;
 import com.ibrahimahmads.github.vbooth.service.AccountService;
 import com.ibrahimahmads.github.vbooth.service.OrderService;
 import com.ibrahimahmads.github.vbooth.service.PaketService;
+import com.ibrahimahmads.github.vbooth.service.PaymentNotificationService;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -29,6 +37,8 @@ public class OrderServiceImpl implements OrderService {
     private final AccountService accountService;
     private final PaketService paketService;
     private final PaymentGateway paymentGateway;
+    private final PaymentNotificationService paymentNotificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public CheckoutResponse createOrderByQris(UUID accountId, UUID paketId) {
@@ -37,10 +47,19 @@ public class OrderServiceImpl implements OrderService {
         if (existing.isPresent()) {
             Orders old = existing.get();
             if (old.getExpiredAt().isAfter(LocalDateTime.now()) && old.getQrUrl() != null) {
-                return toCheckoutResponse(old);
+                return toCheckoutResponse(old);   // QR masih berlaku
             }
-            old.setStatus(OrderStatus.EXPIRED);
-            orderRepository.saveAndFlush(old);
+            // QR sudah lewat batas tapi order masih PENDING: tanya Midtrans, jangan menebak
+            OrderStatus resolved = resolveStaleOrder(old);
+            if (resolved == OrderStatus.PAID) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Pembayaran sebelumnya sudah diterima");
+            }
+            if (resolved == OrderStatus.PENDING) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Pembayaran sebelumnya sedang diverifikasi, coba lagi beberapa menit");
+            }
+            // EXPIRED atau FAILED: lanjut membuat order baru
         }
         Account account = accountService.getAccountEntityById(accountId);
         Paket paket = paketService.getById(paketId);
@@ -53,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderNumber(orderNumber)
                 .paket(paket)
                 .status(OrderStatus.PENDING)
-                .expiredAt(LocalDateTime.now().plusHours(1))
+                .expiredAt(LocalDateTime.now().plusMinutes(5))
                 .amount(paket.getPrice())
                 .build();
         QrisPaymentResponse response;
@@ -92,9 +111,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public void expiredPendingOrders() {
-        orderRepository.expirePendingOrders(OrderStatus.PENDING,OrderStatus.EXPIRED, LocalDateTime.now());
+    public void expiredOrdersByOrderNumbers(List<String> orderNumbers, OrderStatus expiredStatus, OrderStatus pendingStatus) {
+        orderRepository.expireByOrderNumber(orderNumbers, expiredStatus, pendingStatus);
+    }
+
+    @Override
+    public List<String> getAllOrderNumbersBeforeExpired(OrderStatus status, LocalDateTime expiredAt, int limit) {
+        return orderRepository.getAllOrderNumberByStatusAndExpiredAtBefore(status,expiredAt, PageRequest.of(0, limit));
+    }
+
+    @Override
+    public List<String> getAllOrderNumbersBeforeExpired(OrderStatus status, LocalDateTime expiredAt) {
+        return orderRepository.getAllOrderNumberByStatusAndExpiredAtBefore(status,expiredAt);
     }
 
     @Override
@@ -123,5 +151,15 @@ public class OrderServiceImpl implements OrderService {
                 .expiredAt(o.getExpiredAt() == null ? null
                         : o.getExpiredAt().atZone(ZoneId.of("Asia/Jakarta")).toOffsetDateTime().toString())
                 .build();
+    }
+
+    private OrderStatus resolveStaleOrder(Orders old) {
+        try {
+            paymentGateway.checkStatus(old.getOrderNumber()).ifPresent(s ->
+                    paymentNotificationService.apply(old.getOrderNumber(), s.transactionStatus(), s.grossAmount()));
+        } catch (Exception e) {
+            log.warn("Gagal cek status Midtrans untuk {}: {}", old.getOrderNumber(), e.getMessage());
+        }
+        return orderRepository.getStatusByOrderNumber(old.getOrderNumber()).orElse(OrderStatus.PENDING);
     }
 }
