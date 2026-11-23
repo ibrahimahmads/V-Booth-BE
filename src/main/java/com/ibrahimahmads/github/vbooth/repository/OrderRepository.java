@@ -2,10 +2,10 @@ package com.ibrahimahmads.github.vbooth.repository;
 
 import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface OrderRepository extends JpaRepository<Orders, UUID> {
+public interface OrderRepository extends JpaRepository<Orders, UUID>, JpaSpecificationExecutor<Orders> {
     @Modifying(clearAutomatically = true)
     @Query("""
     UPDATE Orders o
@@ -30,10 +30,15 @@ public interface OrderRepository extends JpaRepository<Orders, UUID> {
     List<String> getAllOrderNumberByStatusAndExpiredAtBefore(@Param("status") OrderStatus status, @Param("now") LocalDateTime expiredAt, Pageable pageable);
     @Query("SELECT o.orderNumber FROM Orders o WHERE o.status = :status AND o.expiredAt <= :now")
     List<String> getAllOrderNumberByStatusAndExpiredAtBefore(@Param("status") OrderStatus status, @Param("now") LocalDateTime expiredAt);
-    List<Orders> findAllByAccountId(UUID accountId);
+//    @EntityGraph(attributePaths = {"paket", "event"})
+//    Page<Orders> findAllByAccountId(UUID accountId, Pageable pageable, Specification<Orders> specification );
+    @Override
+    @EntityGraph(attributePaths = {"paket", "event"})
+    Page<Orders> findAll(Specification<Orders> spec, Pageable pageable);
     Optional<Orders> findByIdAndAccountId(UUID id, UUID accountId);
     Optional<Orders> findByAccountIdAndPaketIdAndStatus(UUID accountId, UUID paketId, OrderStatus status);
-    Optional<OrderStatus> getStatusByOrderNumber(String orderNumber);
+    @Query("SELECT o.status FROM Orders o WHERE o.orderNumber = :orderNumber")
+    Optional<OrderStatus> getStatusByOrderNumber(@Param("orderNumber") String orderNumber);
     Optional<Orders> findByOrderNumberAndAccountId(String orderNumber, UUID accountId);
     Optional<Orders> findOrdersByOrderNumber(String orderNumber);
 }

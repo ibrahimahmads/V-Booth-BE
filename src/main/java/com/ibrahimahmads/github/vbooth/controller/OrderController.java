@@ -1,12 +1,17 @@
 package com.ibrahimahmads.github.vbooth.controller;
 
+import com.ibrahimahmads.github.vbooth.dto.request.OrderUserSearch;
 import com.ibrahimahmads.github.vbooth.dto.response.CheckoutResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
+import com.ibrahimahmads.github.vbooth.dto.response.PageResponseWrapper;
 import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.security.model.UserContext;
 import com.ibrahimahmads.github.vbooth.service.OrderService;
 import com.ibrahimahmads.github.vbooth.service.OrderStreamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,14 +37,31 @@ public class OrderController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<OrderResponse>> getAllOrder(){
-        return ResponseEntity.ok().body(orderService.getAllOrders());
+    public ResponseEntity<PageResponseWrapper<OrderResponse>> getAllOrder(
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size", defaultValue = "5") Integer size,
+            @RequestParam(name = "sortBy", defaultValue = "createdAt")
+            String sortBy,
+            @RequestParam(name = "direction", defaultValue = "DESC") String direction
+    ){
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = PageRequest.of(page-1, Math.min(size,50), sort);
+        return ResponseEntity.ok(new PageResponseWrapper<>(orderService.getAllOrders(pageable)));
     }
 
     @GetMapping("/me/all")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<OrderResponse>> getAllMyOrder(@AuthenticationPrincipal UserContext userContext){
-        return ResponseEntity.ok().body(orderService.getAllOrdersByAccountId(userContext.getAccountId()));
+    public ResponseEntity<PageResponseWrapper<OrderResponse>> getAllMyOrder(@AuthenticationPrincipal UserContext userContext,
+                                                             @ModelAttribute OrderUserSearch search,
+                                                             @RequestParam(name = "page", defaultValue = "1") Integer page,
+                                                             @RequestParam(name = "size", defaultValue = "5") Integer size,
+                                                             @RequestParam(name = "sortBy", defaultValue = "createdAt")
+                                                                 String sortBy,
+                                                             @RequestParam(name = "direction", defaultValue = "DESC") String direction
+    ){
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+        Pageable pageable = PageRequest.of(page-1, Math.min(size,50), sort);
+        return ResponseEntity.ok(new PageResponseWrapper<>(orderService.getAllOrdersByAccountId(userContext.getAccountId(),pageable,search)));
     }
 
     @GetMapping("/{id}")

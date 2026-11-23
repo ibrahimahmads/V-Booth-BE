@@ -17,6 +17,11 @@ public class OrderResponse {
     private String orderNumber;
     private Long amount;
     private OrderStatus orderStatus;
-    private String expiredAt;
+    private String paidAtDay;
+    private String paidAtTime;
+    private String paymentMethod;
     private String qrUrl;
+    private UUID accountId;
+    private UUID eventId;
+    private String paketName;
 }

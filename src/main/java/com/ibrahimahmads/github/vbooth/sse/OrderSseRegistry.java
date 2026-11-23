@@ -74,6 +74,6 @@ public class OrderSseRegistry {
     private SseEmitter.SseEventBuilder buildEvent(String orderNumber, OrderStatus status) {
         return SseEmitter.event()
                 .name("order-status")
-                .data(Map.of("orderId", orderNumber, "status", status.name()));
+                .data(Map.of("orderNumber", orderNumber, "status", status.name()));
     }
 }

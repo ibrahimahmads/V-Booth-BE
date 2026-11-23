@@ -1,26 +1,29 @@
 package com.ibrahimahmads.github.vbooth.service.impl;
 
+import com.ibrahimahmads.github.vbooth.dto.request.OrderUserSearch;
 import com.ibrahimahmads.github.vbooth.dto.response.CheckoutResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.QrisPaymentResponse;
 import com.ibrahimahmads.github.vbooth.entity.Account;
 import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.entity.Paket;
-import com.ibrahimahmads.github.vbooth.event.OrderStatusChangeEvent;
 import com.ibrahimahmads.github.vbooth.gateway.PaymentGateway;
 import com.ibrahimahmads.github.vbooth.repository.OrderRepository;
 import com.ibrahimahmads.github.vbooth.service.AccountService;
 import com.ibrahimahmads.github.vbooth.service.OrderService;
 import com.ibrahimahmads.github.vbooth.service.PaketService;
 import com.ibrahimahmads.github.vbooth.service.PaymentNotificationService;
+import com.ibrahimahmads.github.vbooth.specification.OrderUserSpecification;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -72,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderNumber(orderNumber)
                 .paket(paket)
                 .status(OrderStatus.PENDING)
-                .expiredAt(LocalDateTime.now().plusMinutes(5))
+                .expiredAt(LocalDateTime.now().plusMinutes(3))
                 .amount(paket.getPrice())
                 .build();
         QrisPaymentResponse response;
@@ -126,13 +129,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponse> getAllOrders() {
-        return orderRepository.findAll().stream().map(Orders::toResponse).toList();
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable).map(Orders::toResponse);
     }
 
     @Override
-    public List<OrderResponse> getAllOrdersByAccountId(UUID accountId) {
-        return orderRepository.findAllByAccountId(accountId).stream().map(Orders::toResponse).toList();
+    public Page<OrderResponse> getAllOrdersByAccountId(UUID accountId, Pageable pageable, OrderUserSearch search) {
+        Specification<Orders> specification = OrderUserSpecification.getSpecification(accountId, search);
+        return orderRepository.findAll(specification,pageable).map(Orders::toResponse);
     }
 
     @Override

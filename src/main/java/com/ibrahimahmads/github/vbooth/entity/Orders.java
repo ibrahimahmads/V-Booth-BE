@@ -3,6 +3,7 @@ package com.ibrahimahmads.github.vbooth.entity;
 import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
+import com.ibrahimahmads.github.vbooth.utils.helper.DateUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -59,8 +60,13 @@ public class Orders extends BaseCreatedEntity {
                 .orderNumber(orderNumber)
                 .amount(amount)
                 .orderStatus(status)
-                .expiredAt(String.valueOf(expiredAt))
+                .paidAtDay(DateUtil.formatDate(paidAt))
+                .paidAtTime(DateUtil.formatTime(paidAt))
                 .qrUrl(qrUrl)
+                .paymentMethod(paymentMethod)
+                .accountId(account.getId())
+                .eventId(event==null? null: event.getId())
+                .paketName(paket.getName())
                 .build();
     }
 }
