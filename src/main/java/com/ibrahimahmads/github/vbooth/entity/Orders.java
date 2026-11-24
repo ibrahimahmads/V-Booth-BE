@@ -1,5 +1,6 @@
 package com.ibrahimahmads.github.vbooth.entity;
 
+import com.ibrahimahmads.github.vbooth.dto.response.OrderDetailResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
@@ -67,6 +68,31 @@ public class Orders extends BaseCreatedEntity {
                 .accountId(account.getId())
                 .eventId(event==null? null: event.getId())
                 .paketName(paket.getName())
+                .build();
+    }
+
+    public OrderDetailResponse toDetailResponse() {
+        return OrderDetailResponse.builder()
+                .id(id)
+                .orderNumber(orderNumber)
+                .amount(amount)
+                .status(status)
+                .qrUrl(qrUrl)
+                .paidAt(paidAt)
+                .expiredAt(expiredAt)
+                .accountId(account.getId())
+                .accountName(account.getName())
+                .accountEmail(account.getEmail())
+                .paket(OrderDetailResponse.PaketInfo.builder()
+                        .id(paket.getId())
+                        .name(paket.getName())
+                        .price(paket.getPrice())
+                        .build())
+                .event(event == null ? null : OrderDetailResponse.EventInfo.builder()
+                        .id(event.getId())
+                        .status(event.getEventStatus())
+                        .name(event.getEventName())
+                        .build())
                 .build();
     }
 }

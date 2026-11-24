@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
 import com.ibrahimahmads.github.vbooth.entity.base.BaseCreatedEntity;
 import com.ibrahimahmads.github.vbooth.utils.enums.EventStatus;
-import com.ibrahimahmads.github.vbooth.utils.enums.EventTypes;
 import com.ibrahimahmads.github.vbooth.utils.helper.DateUtil;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,8 +37,6 @@ public class Event extends BaseCreatedEntity {
     private EventStatus eventStatus;
     private String eventDescription;
     private String eventLocation;
-    @Enumerated(EnumType.STRING)
-    private EventTypes eventType;
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
@@ -59,7 +56,6 @@ public class Event extends BaseCreatedEntity {
                 .eventName(eventName)
                 .slug(slug)
                 .eventDescription(eventDescription)
-                .eventType(eventType)
                 .eventStatus(eventStatus)
                 .eventDate(DateUtil.formatDate(eventDate))
                 .eventStartTime(DateUtil.formatTime(eventStartTime))

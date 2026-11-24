@@ -2,6 +2,7 @@ package com.ibrahimahmads.github.vbooth.service.impl;
 
 import com.ibrahimahmads.github.vbooth.dto.request.OrderUserSearch;
 import com.ibrahimahmads.github.vbooth.dto.response.CheckoutResponse;
+import com.ibrahimahmads.github.vbooth.dto.response.OrderDetailResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.QrisPaymentResponse;
 import com.ibrahimahmads.github.vbooth.entity.Account;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -50,9 +52,9 @@ public class OrderServiceImpl implements OrderService {
         if (existing.isPresent()) {
             Orders old = existing.get();
             if (old.getExpiredAt().isAfter(LocalDateTime.now()) && old.getQrUrl() != null) {
-                return toCheckoutResponse(old);   // QR masih berlaku
+                return toCheckoutResponse(old);
             }
-            // QR sudah lewat batas tapi order masih PENDING: tanya Midtrans, jangan menebak
+
             OrderStatus resolved = resolveStaleOrder(old);
             if (resolved == OrderStatus.PAID) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -62,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Pembayaran sebelumnya sedang diverifikasi, coba lagi beberapa menit");
             }
-            // EXPIRED atau FAILED: lanjut membuat order baru
+
         }
         Account account = accountService.getAccountEntityById(accountId);
         Paket paket = paketService.getById(paketId);
@@ -75,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderNumber(orderNumber)
                 .paket(paket)
                 .status(OrderStatus.PENDING)
-                .expiredAt(LocalDateTime.now().plusMinutes(3))
+                .expiredAt(LocalDateTime.now().plusMinutes(60))
                 .amount(paket.getPrice())
                 .build();
         QrisPaymentResponse response;
@@ -94,13 +96,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Orders getOrderById(UUID id) {
-        return orderRepository.findById(id).orElseThrow(()-> new RuntimeException("Order tidak ditemukan"));
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderById(UUID id) {
+        return orderRepository.findById(id).orElseThrow(()-> new RuntimeException("Order tidak ditemukan")).toDetailResponse();
     }
 
     @Override
-    public Orders getOrderByIdAndAccountId(UUID id, UUID accountId) {
-        return orderRepository.findByIdAndAccountId(id,accountId).orElseThrow(()-> new RuntimeException("Order tidak ditemukan"));
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderByIdAndAccountId(UUID id, UUID accountId) {
+        return orderRepository.findByIdAndAccountId(id,accountId).orElseThrow(()-> new RuntimeException("Order tidak ditemukan")).toDetailResponse();
     }
 
     @Override
@@ -129,11 +133,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         return orderRepository.findAll(pageable).map(Orders::toResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrdersByAccountId(UUID accountId, Pageable pageable, OrderUserSearch search) {
         Specification<Orders> specification = OrderUserSpecification.getSpecification(accountId, search);
         return orderRepository.findAll(specification,pageable).map(Orders::toResponse);

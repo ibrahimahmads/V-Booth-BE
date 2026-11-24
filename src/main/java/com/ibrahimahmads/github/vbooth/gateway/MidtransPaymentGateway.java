@@ -42,7 +42,7 @@ public class MidtransPaymentGateway implements PaymentGateway{
                         "acquirer", "gopay"
                 ),
                 "custom_expiry", Map.of(
-                        "expiry_duration", 3,
+                        "expiry_duration", 60,
                         "unit", "minute"
                 )
         );

@@ -29,7 +29,6 @@ public class OrderUserSpecification {
                     predicates.add(criteriaBuilder.or(
                             criteriaBuilder.like(criteriaBuilder.lower(root.get("orderNumber")),pattern),
                             criteriaBuilder.like(criteriaBuilder.lower(root.get("paymentMethod")), pattern),
-                            criteriaBuilder.like(criteriaBuilder.lower(root.get("amount")), pattern),
                             criteriaBuilder.like(criteriaBuilder.lower(paketJoin.get("name")), pattern),
                             criteriaBuilder.like(criteriaBuilder.lower(eventJoin.get("eventName")), pattern)
                     ));

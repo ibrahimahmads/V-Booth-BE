@@ -3,6 +3,7 @@ package com.ibrahimahmads.github.vbooth.service;
 import com.ibrahimahmads.github.vbooth.dto.request.EventCreateRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.EventUpdateRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
+import com.ibrahimahmads.github.vbooth.entity.Event;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,4 +16,5 @@ public interface EventService {
     void delete(UUID id, UUID accountId);
     List<EventResponse> getAll();
     List<EventResponse> getAllByAccountId(UUID accountId);
+    EventResponse save(Event event);
 }

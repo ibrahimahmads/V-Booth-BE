@@ -43,11 +43,15 @@ public class EventServiceImpl implements EventService {
                 .eventStartTime(payload.eventStartTime())
                 .eventEndTime(payload.eventEndTime())
                 .eventLocation(payload.eventLocation())
-                .eventType(payload.eventType())
                 .account(account)
                 .slug(payload.slug().toLowerCase().trim())
                 .eventStatus(EventStatus.DRAFT)
                 .build();
+        return eventRepository.save(event).toResponse();
+    }
+
+    @Override
+    public EventResponse save(Event event) {
         return eventRepository.save(event).toResponse();
     }
 

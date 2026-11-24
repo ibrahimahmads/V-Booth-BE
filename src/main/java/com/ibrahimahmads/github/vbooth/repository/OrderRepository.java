@@ -2,6 +2,7 @@ package com.ibrahimahmads.github.vbooth.repository;
 
 import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,15 +31,17 @@ public interface OrderRepository extends JpaRepository<Orders, UUID>, JpaSpecifi
     List<String> getAllOrderNumberByStatusAndExpiredAtBefore(@Param("status") OrderStatus status, @Param("now") LocalDateTime expiredAt, Pageable pageable);
     @Query("SELECT o.orderNumber FROM Orders o WHERE o.status = :status AND o.expiredAt <= :now")
     List<String> getAllOrderNumberByStatusAndExpiredAtBefore(@Param("status") OrderStatus status, @Param("now") LocalDateTime expiredAt);
-//    @EntityGraph(attributePaths = {"paket", "event"})
-//    Page<Orders> findAllByAccountId(UUID accountId, Pageable pageable, Specification<Orders> specification );
     @Override
     @EntityGraph(attributePaths = {"paket", "event"})
-    Page<Orders> findAll(Specification<Orders> spec, Pageable pageable);
+    Page<Orders> findAll(@NonNull Specification<Orders> spec, @NonNull Pageable pageable);
+    @EntityGraph(attributePaths = {"account", "paket", "event"})
     Optional<Orders> findByIdAndAccountId(UUID id, UUID accountId);
     Optional<Orders> findByAccountIdAndPaketIdAndStatus(UUID accountId, UUID paketId, OrderStatus status);
     @Query("SELECT o.status FROM Orders o WHERE o.orderNumber = :orderNumber")
     Optional<OrderStatus> getStatusByOrderNumber(@Param("orderNumber") String orderNumber);
     Optional<Orders> findByOrderNumberAndAccountId(String orderNumber, UUID accountId);
     Optional<Orders> findOrdersByOrderNumber(String orderNumber);
+    @Override
+    @EntityGraph(attributePaths = {"account", "paket", "event"})
+    Optional<Orders> findById(@NonNull UUID id);
 }

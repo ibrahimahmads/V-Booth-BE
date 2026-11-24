@@ -1,7 +1,6 @@
 package com.ibrahimahmads.github.vbooth.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ibrahimahmads.github.vbooth.utils.enums.EventTypes;
 import com.ibrahimahmads.github.vbooth.utils.validations.ValidSlug;
 import jakarta.validation.constraints.*;
 
@@ -30,8 +29,6 @@ public record EventCreateRequest(
         @JsonFormat(pattern = "HH:mm:ss")
         LocalTime eventEndTime,
         @NotBlank(message = "Lokasi event wajib diisi")
-        String eventLocation,
-        @NotNull(message = "Jenis event wajib diisi")
-        EventTypes eventType
+        String eventLocation
 ) {
 }

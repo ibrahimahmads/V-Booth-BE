@@ -2,9 +2,9 @@ package com.ibrahimahmads.github.vbooth.controller;
 
 import com.ibrahimahmads.github.vbooth.dto.request.OrderUserSearch;
 import com.ibrahimahmads.github.vbooth.dto.response.CheckoutResponse;
+import com.ibrahimahmads.github.vbooth.dto.response.OrderDetailResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.OrderResponse;
 import com.ibrahimahmads.github.vbooth.dto.response.PageResponseWrapper;
-import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.security.model.UserContext;
 import com.ibrahimahmads.github.vbooth.service.OrderService;
 import com.ibrahimahmads.github.vbooth.service.OrderStreamService;
@@ -66,13 +66,13 @@ public class OrderController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Orders> getOrderById(@PathVariable UUID id){
+    public ResponseEntity<OrderDetailResponse> getOrderById(@PathVariable UUID id){
         return ResponseEntity.ok().body(orderService.getOrderById(id));
     }
 
     @GetMapping("/me/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Orders> getMyOrderById(@PathVariable UUID id, @AuthenticationPrincipal UserContext userContext){
+    public ResponseEntity<OrderDetailResponse> getMyOrderById(@PathVariable UUID id, @AuthenticationPrincipal UserContext userContext){
         return ResponseEntity.ok().body(orderService.getOrderByIdAndAccountId(id,userContext.getAccountId()));
     }
 

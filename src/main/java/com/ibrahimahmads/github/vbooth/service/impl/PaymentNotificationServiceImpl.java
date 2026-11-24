@@ -2,10 +2,13 @@ package com.ibrahimahmads.github.vbooth.service.impl;
 
 import com.ibrahimahmads.github.vbooth.dto.request.MidtransNotificationRequest;
 import com.ibrahimahmads.github.vbooth.dto.response.PaymentStatusResponse;
+import com.ibrahimahmads.github.vbooth.entity.Event;
 import com.ibrahimahmads.github.vbooth.entity.Orders;
 import com.ibrahimahmads.github.vbooth.gateway.PaymentGateway;
 import com.ibrahimahmads.github.vbooth.repository.OrderRepository;
+import com.ibrahimahmads.github.vbooth.service.EventService;
 import com.ibrahimahmads.github.vbooth.service.PaymentNotificationService;
+import com.ibrahimahmads.github.vbooth.utils.enums.EventStatus;
 import com.ibrahimahmads.github.vbooth.utils.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PaymentNotificationServiceImpl implements PaymentNotificationService {
     private final OrderRepository orderRepository;
+    private final EventService eventService;
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentGateway paymentGateway;
 
@@ -98,6 +102,13 @@ public class PaymentNotificationServiceImpl implements PaymentNotificationServic
         }
         order.setStatus(OrderStatus.PAID);
         order.setPaidAt(LocalDateTime.now());
+        Event event = Event.builder()
+                .account(order.getAccount())
+                .paket(order.getPaket())
+                .eventStatus(EventStatus.DRAFT)
+                .build();
+        eventService.save(event);
+        order.setEvent(event);
 
         // TODO: beri hak paket / buat Event di sini (satu transaksi dengan perubahan status)
     }
