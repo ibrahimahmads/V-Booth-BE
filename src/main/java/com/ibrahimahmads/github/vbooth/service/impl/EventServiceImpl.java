@@ -2,14 +2,20 @@ package com.ibrahimahmads.github.vbooth.service.impl;
 
 import com.ibrahimahmads.github.vbooth.dto.request.EventCreateRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.EventUpdateRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.EventUserSeach;
 import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
 import com.ibrahimahmads.github.vbooth.entity.Account;
 import com.ibrahimahmads.github.vbooth.entity.Event;
 import com.ibrahimahmads.github.vbooth.repository.EventRepository;
 import com.ibrahimahmads.github.vbooth.service.AccountService;
 import com.ibrahimahmads.github.vbooth.service.EventService;
+import com.ibrahimahmads.github.vbooth.specification.EventAdminSpecification;
+import com.ibrahimahmads.github.vbooth.specification.EventUserSpecification;
 import com.ibrahimahmads.github.vbooth.utils.enums.EventStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -128,12 +134,14 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventResponse> getAll() {
-        return eventRepository.findAll().stream().map(Event::toResponse).toList();
+    public Page<EventResponse> getAll(Pageable pageable, EventUserSeach search) {
+        Specification<Event> specification = EventAdminSpecification.getSpecification(search);
+        return eventRepository.findAll(specification,pageable).map(Event::toResponse);
     }
 
     @Override
-    public List<EventResponse> getAllByAccountId(UUID accountId) {
-        return eventRepository.findAllByAccount_Id(accountId).stream().map(Event::toResponse).toList();
+    public Page<EventResponse> getAllByAccountId(UUID accountId, Pageable pageable, EventUserSeach search) {
+        Specification<Event> specification = EventUserSpecification.getSpecification(accountId, search);
+        return eventRepository.findAll(specification, pageable).map(Event::toResponse);
     }
 }

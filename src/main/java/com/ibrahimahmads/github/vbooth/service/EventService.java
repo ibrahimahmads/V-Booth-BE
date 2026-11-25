@@ -2,10 +2,12 @@ package com.ibrahimahmads.github.vbooth.service;
 
 import com.ibrahimahmads.github.vbooth.dto.request.EventCreateRequest;
 import com.ibrahimahmads.github.vbooth.dto.request.EventUpdateRequest;
+import com.ibrahimahmads.github.vbooth.dto.request.EventUserSeach;
 import com.ibrahimahmads.github.vbooth.dto.response.EventResponse;
 import com.ibrahimahmads.github.vbooth.entity.Event;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface EventService {
@@ -14,7 +16,7 @@ public interface EventService {
     EventResponse getEventById(UUID id);
     EventResponse update(UUID accountId,UUID id, EventUpdateRequest payload);
     void delete(UUID id, UUID accountId);
-    List<EventResponse> getAll();
-    List<EventResponse> getAllByAccountId(UUID accountId);
+    Page<EventResponse> getAll(Pageable pageable, EventUserSeach search);
+    Page<EventResponse> getAllByAccountId(UUID accountId, Pageable pageable, EventUserSeach search);
     EventResponse save(Event event);
 }

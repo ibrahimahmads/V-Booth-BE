@@ -22,6 +22,16 @@ public class EventResponse {
     private String eventStartTime;
     private String eventEndTime;
     private String eventLocation;
-    private EventTypes eventType;
+    private Integer numberOfGreetings;
     private EventStatus eventStatus;
+    private EventTypes eventTypes;
+    private PaketInfo paket;
+
+    @Getter
+    @Builder
+    public static class PaketInfo {
+        private UUID id;
+        private String name;
+        private Integer maxGuest;
+    }
 }
