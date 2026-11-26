@@ -20,7 +20,7 @@ public class PaketServiceImpl implements PaketService {
                 .name(payload.name())
                 .price(payload.price())
                 .description(payload.description())
-                .maxGuest(payload.maxGuest())
+                .maxGreetings(payload.maxGreetings())
                 .eventActivePeriod(payload.eventActivePeriod())
                 .galeryActivePeriod(payload.galeryActivePeriod())
                 .isCanPhotoAndVoice(true)
@@ -41,7 +41,7 @@ public class PaketServiceImpl implements PaketService {
         paket.setPrice(payload.price());
         paket.setName(payload.name());
         paket.setEventActivePeriod(payload.eventActivePeriod());
-        paket.setMaxGuest(payload.maxGuest());
+        paket.setMaxGreetings(payload.maxGreetings());
         paket.setGaleryActivePeriod(payload.galeryActivePeriod());
         return paketRepository.save(paket);
     }

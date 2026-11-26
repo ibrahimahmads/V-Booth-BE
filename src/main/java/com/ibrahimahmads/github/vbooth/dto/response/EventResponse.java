@@ -24,7 +24,7 @@ public class EventResponse {
     private String eventLocation;
     private Integer numberOfGreetings;
     private EventStatus eventStatus;
-    private EventTypes eventTypes;
+    private EventTypes eventType;
     private PaketInfo paket;
 
     @Getter
@@ -32,6 +32,6 @@ public class EventResponse {
     public static class PaketInfo {
         private UUID id;
         private String name;
-        private Integer maxGuest;
+        private Integer maxGreetings;
     }
 }

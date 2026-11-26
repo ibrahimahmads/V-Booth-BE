@@ -5,7 +5,7 @@ public record PaketRequest(
         String description,
         Integer eventActivePeriod,
         Integer galeryActivePeriod,
-        Integer maxGuest,
+        Integer maxGreetings,
         Long price
 ) {
 }

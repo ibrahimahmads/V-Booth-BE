@@ -8,6 +8,7 @@ import com.ibrahimahmads.github.vbooth.utils.enums.EventTypes;
 import com.ibrahimahmads.github.vbooth.utils.helper.DateUtil;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
@@ -45,13 +46,18 @@ public class Event extends BaseCreatedEntity {
     private Account account;
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("event")
+    @Builder.Default
     private List<Frame> frameList = new ArrayList<>();
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("event")
+    @Builder.Default
     private List<Greetings> greetingsList = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paket_id")
     private Paket paket;
+
+    @Formula("(select count(g.id) from m_greeting g where g.event_id = id)")
+    private Integer numberOfGreetings;
 
     public EventResponse toResponse(){
         return EventResponse.builder()
@@ -61,14 +67,15 @@ public class Event extends BaseCreatedEntity {
                 .eventDescription(eventDescription)
                 .eventStatus(eventStatus)
                 .eventLocation(eventLocation)
-                .numberOfGreetings(greetingsList.size())
-                .eventDate(DateUtil.formatDate(eventDate))
+                .eventType(eventTypes)
+                .numberOfGreetings(numberOfGreetings == null? 0 : numberOfGreetings)
+                .eventDate(eventDate.toString())
                 .eventStartTime(DateUtil.formatTime(eventStartTime))
                 .eventEndTime(DateUtil.formatTime(eventEndTime))
                 .paket(EventResponse.PaketInfo.builder()
                         .id(paket.getId())
                         .name(paket.getName())
-                        .maxGuest(paket.getMaxGuest())
+                        .maxGreetings(paket.getMaxGreetings())
                         .build())
                 .build();
     }

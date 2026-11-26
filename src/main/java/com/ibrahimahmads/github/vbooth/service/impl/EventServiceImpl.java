@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -74,6 +75,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventResponse update(UUID accountId, UUID id, EventUpdateRequest payload) {
         Event event = eventRepository.findByIdAndAccount_Id(id,accountId).orElseThrow(()-> new RuntimeException("Event tidak ditemukan"));
 
@@ -81,9 +83,11 @@ public class EventServiceImpl implements EventService {
             throw new IllegalStateException("Event yang sudah selesai atau dibatalkan tidak dapat diubah");
         }
 
-        boolean isWithin48Hours = event.getEventDate().isBefore(LocalDate.now().plusDays(2));
+        LocalDate currentDate = event.getEventDate();
 
-        boolean isDateChanged = !event.getEventDate().isEqual(payload.eventDate());
+        boolean isWithin48Hours = currentDate != null && currentDate.isBefore(LocalDate.now().plusDays(2));
+
+        boolean isDateChanged = currentDate != null && !currentDate.isEqual(payload.eventDate());
         boolean isTimeChanged = (payload.eventStartTime() != null && !payload.eventStartTime().equals(event.getEventStartTime())) ||
                 (payload.eventEndTime() != null && !payload.eventEndTime().equals(event.getEventEndTime()));
 
@@ -98,7 +102,8 @@ public class EventServiceImpl implements EventService {
         }
 
         String newSlug = payload.slug().toLowerCase().trim();
-        if (!event.getSlug().equalsIgnoreCase(newSlug)) {
+        String currentSlug = event.getSlug();
+        if (currentSlug == null || !currentSlug.equalsIgnoreCase(newSlug)) {
             if (isWithin48Hours) {
                 throw new IllegalStateException("Link event tidak dapat diubah saat mendekati hari H");
             }
@@ -112,9 +117,11 @@ public class EventServiceImpl implements EventService {
         event.setEventName(payload.eventName());
         event.setEventDescription(payload.eventDescription());
         event.setEventDate(payload.eventDate());
+        event.setEventTypes(payload.eventType());
         event.setEventStartTime(payload.eventStartTime());
         event.setEventEndTime(payload.eventEndTime());
         event.setEventLocation(payload.eventLocation());
+        event.setEventStatus(EventStatus.ACTIVE);
         Event updatedEvent = eventRepository.save(event);
         return updatedEvent.toResponse();
     }
